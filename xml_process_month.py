@@ -29,7 +29,7 @@ def main():
         # with open("xml_weather/2018-01.xml") as f:
         #     xml = f.read()
         print(f"{file} start")
-        base = os.path.basename(file)
+        base = os.path.splitext(file)[0]
         soup = BeautifulSoup(xml,'lxml')
         location_data = soup.select('location')
         month_data = [parse_location(row) for row in location_data]
