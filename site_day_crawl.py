@@ -39,8 +39,8 @@ with open('sites') as f:
 
 # panel data
 
-for site in sites[:5]:
-    for date in dates[:5]:
+for site in sites[:3]:
+    for date in dates[:3]:
         payload = {'station':site['station'], 'stname':site['stname'],'datepicker':date}
         result = urlencode(payload, quote_via=quote_plus)
         url = "https://e-service.cwb.gov.tw/HistoryDataQuery/DayDataController.do?command=viewMain&{}".format(result).replace('%','%25') 
@@ -55,7 +55,12 @@ for site in sites[:5]:
         col_name_en = [name.string for name in soup.select("tr.second_tr")[1] if name.string != '\n']
         for item in raw_data:
             parsed_data = dict(zip(col_name_en, parse_data(item)))
-            print(parsed_data)
+            # parsed_data = payload.update(parsed_data)
+            weather_data = {}
+            weather_data.update(payload)
+            weather_data.update(parsed_data)
+
+            print(weather_data)
         
 #len(17)
 
