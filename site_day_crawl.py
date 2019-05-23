@@ -28,6 +28,7 @@ def parse_data(item):
             finally:
                 array.append(c)
     return array
+
 # Read dates
 with open('date2018') as f:
     dates = f.read().split('\n')
@@ -36,26 +37,25 @@ with open('sites') as f:
     sites = [{k: v for k, v in row.items()}
         for row in csv.DictReader(f, skipinitialspace=True)]
 
-soup = fetch(url)
-
-col_name_cn = [name.string for name in soup.select("tr.second_tr")[0] if name.string != '\n']
-col_name_en = [name.string for name in soup.select("tr.second_tr")[1] if name.string != '\n']
-#len(17)
-
-raw_data = soup.select("tr")[-24:]
-
 # panel data
-# station id 
-# date, station name
 
 for site in sites[:5]:
-    for date in date[:5]:
+    for date in dates[:5]:
         payload = {'station':site['station'], 'stname':site['stname'],'datepicker':date}
         result = urlencode(payload, quote_via=quote_plus)
         url = "https://e-service.cwb.gov.tw/HistoryDataQuery/DayDataController.do?command=viewMain&{}".format(result).replace('%','%25') 
-        res = requests.get(url)
-        if 'SeaPres' in res.text:
-            print("Success!")
-        else:
-            print("XXX")
-               
+        # if 'SeaPres' in res.text:
+        #     print("Success!")
+        # else:
+        #     print("XXX")
+        soup = fetch(url)
+        raw_data = soup.select("tr")[-24:]
+
+        col_name_cn = [name.string for name in soup.select("tr.second_tr")[0] if name.string != '\n']
+        col_name_en = [name.string for name in soup.select("tr.second_tr")[1] if name.string != '\n']
+        for item in raw_data:
+            parsed_data = dict(zip(col_name_en, parse_data(item)))
+            print(parsed_data)
+        
+#len(17)
+
