@@ -9,28 +9,23 @@ from sqlalchemy.sql.expression import insert
 from configparser import ConfigParser
 
 # https://e-service.cwb.gov.tw/HistoryDataQuery/index.jsp
-# url = "https://e-service.cwb.gov.tw/HistoryDataQuery/DayDataController.do?command=viewMain&{}".format(result)
-
 engine = create_engine("mysql+pymysql://root:andypersonal@127.0.0.1/Weather")
-
-url = "https://e-service.cwb.gov.tw/HistoryDataQuery/DayDataController.do?command=viewMain&station=C0A9C0&stname=%25E5%25A4%25A9%25E6%25AF%258D&datepicker=2018-05-19#"
-
 
 def fetch(url):
     res = requests.post(url)  # 可能要用request post form data
     soup = BeautifulSoup(res.text, 'lxml')
     return soup
 
-
 def parse_special(x):
     '''T 表微量(小於 0.1mm)，x 表故障，V 表風向不定，/表不明，…表無觀測'''
-    special = {'T': 0, # < 0.1mm
-            'V': None, # Undefined
-            'x': None, # Broken Unknown
-            'X': None,
-            '/': 0, # Unknown
-            '...': None # Not observed 
-            }
+    special = {'T': 0,  # < 0.1mm
+               'V': None,  # Undefined
+               'x': None,  # Broken Unknown
+               'X': None,
+               '/': 0,  # Unknown
+               '...': None,  # Not observed
+               '': 0
+               }
     if x in special.keys():
         try:
             return special[x]
@@ -71,11 +66,10 @@ for site in sites:
         result = urlencode(payload, quote_via=quote_plus)
         url = "https://e-service.cwb.gov.tw/HistoryDataQuery/DayDataController.do?command=viewMain&{}".format(
             result).replace('%', '%25')
-        res = requests.post(url)  # 可能要用request post form data
+        res = requests.post(url)
         soup = BeautifulSoup(res.text, 'lxml')
         if 'SeaPres' in res.text:
             print("Success!")
-            # soup = fetch(url)
             raw_data = soup.select("tr")[-24:]
 
             col_name_cn = [name.string for name in soup.select(
