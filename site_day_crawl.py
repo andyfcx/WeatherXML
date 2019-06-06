@@ -9,7 +9,15 @@ from sqlalchemy.sql.expression import insert
 from configparser import ConfigParser
 
 # https://e-service.cwb.gov.tw/HistoryDataQuery/index.jsp
-engine = create_engine("mysql+pymysql://root:andypersonal@127.0.0.1/Weather")
+
+config = ConfigParser()
+config.read('./mysql_config.ini')
+db_host = config.get('DB', 'host')
+db_user = config.get('DB', 'user')
+db_pwd = config.get('DB', 'password')
+
+engine = create_engine(f"mysql+pymysql://{db_user}:{db_pwd}@{db_host}")
+# engine = create_engine("mysql+pymysql://root:andypersonal@127.0.0.1/Weather")
 
 def fetch(url):
     res = requests.post(url)  # 可能要用request post form data
