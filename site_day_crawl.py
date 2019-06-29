@@ -89,15 +89,15 @@ def crawl(site, date):
         print(date, site, "Crawling Failed!")
 
 # Read dates
-with open('date2018') as f:
-    dates = f.read().split('\n')
-# Read sites
-with open('site_newtaipei') as f:
-    sites = [{k: v for k, v in row.items()}
-             for row in csv.DictReader(f, skipinitialspace=True)]
+# with open('date2018') as f:
+#     dates = f.read().split('\n')
+# # Read sites
+# with open('site_newtaipei') as f:
+#     sites = [{k: v for k, v in row.items()}
+#              for row in csv.DictReader(f, skipinitialspace=True)]
 
-for site in sites:
-    for date in dates:
-        crawl(site, date)
+# for site in sites:
+#     for date in dates:
+#         crawl(site, date)
 
 # len(17)
