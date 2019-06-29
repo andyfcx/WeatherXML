@@ -16,7 +16,7 @@ db_host = config.get('DB', 'host')
 db_user = config.get('DB', 'user')
 db_pwd = config.get('DB', 'password')
 
-engine = create_engine(f"mysql+pymysql://{db_user}:{db_pwd}@{db_host}")
+engine = create_engine(f"mysql+pymysql://{db_user}:{db_pwd}@{db_host}/Weather")
 # engine = create_engine("mysql+pymysql://root:andypersonal@127.0.0.1/Weather")
 
 def fetch(url):
