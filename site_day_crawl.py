@@ -59,6 +59,35 @@ def pipeline(weather_item):
     i = insert(weather_data)
     engine.execute(i.values(weather_item))
 
+def crawl(site, date):
+    payload = {'station': site['station'],
+                   'stname': site['stname'], 'datepicker': date}
+        #這邊把迴圈拿掉，payload改成直接吃就好了
+    result = urlencode(payload, quote_via=quote_plus)
+    url = "https://e-service.cwb.gov.tw/HistoryDataQuery/DayDataController.do?command=viewMain&{}".format(
+        result).replace('%', '%25')
+    res = requests.post(url)
+    soup = BeautifulSoup(res.text, 'lxml')
+    if 'SeaPres' in res.text:
+        print("Success!")
+        raw_data = soup.select("tr")[-24:]
+
+        col_name_cn = [name.string for name in soup.select(
+            "tr.second_tr")[0] if name.string != '\n']
+        col_name_en = [name.string for name in soup.select(
+            "tr.second_tr")[1] if name.string != '\n']
+        for item in raw_data:
+            parsed_data = dict(zip(col_name_en, parse_data(item)))
+
+            weather_data = {}
+            weather_data.update(payload)
+            weather_data.update(parsed_data)  # combine 2 dict
+
+            pipeline(weather_data)
+        print(date, site, "Complete")
+    else:
+        print(date, site, "Crawling Failed!")
+
 # Read dates
 with open('date2018') as f:
     dates = f.read().split('\n')
@@ -69,31 +98,6 @@ with open('site_newtaipei') as f:
 
 for site in sites:
     for date in dates:
-        payload = {'station': site['station'],
-                   'stname': site['stname'], 'datepicker': date}
-        result = urlencode(payload, quote_via=quote_plus)
-        url = "https://e-service.cwb.gov.tw/HistoryDataQuery/DayDataController.do?command=viewMain&{}".format(
-            result).replace('%', '%25')
-        res = requests.post(url)
-        soup = BeautifulSoup(res.text, 'lxml')
-        if 'SeaPres' in res.text:
-            print("Success!")
-            raw_data = soup.select("tr")[-24:]
-
-            col_name_cn = [name.string for name in soup.select(
-                "tr.second_tr")[0] if name.string != '\n']
-            col_name_en = [name.string for name in soup.select(
-                "tr.second_tr")[1] if name.string != '\n']
-            for item in raw_data:
-                parsed_data = dict(zip(col_name_en, parse_data(item)))
-
-                weather_data = {}
-                weather_data.update(payload)
-                weather_data.update(parsed_data)  # combine 2 dict
-
-                pipeline(weather_data)
-            print(date, site, "Complete")
-        else:
-            print(date, site, "Crawling Failed!")
+        crawl(site, date)
 
 # len(17)
