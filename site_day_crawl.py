@@ -11,7 +11,7 @@ from configparser import ConfigParser
 # https://e-service.cwb.gov.tw/HistoryDataQuery/index.jsp
 
 config = ConfigParser()
-config.read('./mysql_config.ini')
+config.read('./config.ini')
 db_host = config.get('DB', 'host')
 db_user = config.get('DB', 'user')
 db_pwd = config.get('DB', 'password')
